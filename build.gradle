@@ -5,7 +5,7 @@ buildscript {
     }
     dependencies {
         //Check for the latest version here: http://plugins.gradle.org/plugin/com.jfrog.artifactory
-        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:latest.release"
+        implementation 'org.jfrog.buildinfo:build-info-extractor-gradle:3.0.1'
     }
 }
 
@@ -15,24 +15,11 @@ buildscript {
 
 repositories {
     jcenter()
-    maven {
-        +url "http://65.0.99.163:8082/artifactory/libs-releases" // The Artifactory (preferably virtual) repository to resolve from
-        credentials {               // Optional resolver credentials (leave out to use anonymous resolution)
-            username = "admin" // Artifactory user name
-            password = "Admin_20" // Password or API Key
-        }
-    }
-  
-    ivy {
-        +url "http://65.0.99.163:8082/ivy-releases"
-        layout "pattern", {     // Optional section for configuring Ivy-style resolution.
-            ivy "[organization]/[module]/[revision]/ivy.xml"
-            artifact "[organization]/[module]/[revision]/[module]-[revision](-[classifier]).[ext]"
-            m2compatible = true // Convert any dots in an [organization] layout value to path separators, similar to Maven's groupId-to-path conversion. False if not specified.
-        }
-    }
+    repositories {
+	maven {
+		url  "https://dl.bintray.com/jfrog/jfrog-jars"
+	}
 }
-
 artifactory {
   +contextUrl = 'http://65.0.99.163:8082/artifactory'   //The base Artifactory URL if not overridden by the publisher/resolver
   publish {
