@@ -13,24 +13,39 @@ buildscript {
     apply plugin: "com.jfrog.artifactory"
 
 
-artifactory {
-    contextUrl = "${artifactory_contextUrl}"   //The base Artifactory URL if not overridden by the publisher/resolver
-    publish {
-        repository {
-            repoKey = 'libs-release-local'
-            username = "${artifactory_user}"
-            password = "${artifactory_password}"
-            
-            
+repositories {
+    jcenter()
+    maven {
+        +url "http://65.0.99.163:8082/artifactory/libs-releases" // The Artifactory (preferably virtual) repository to resolve from
+        credentials {               // Optional resolver credentials (leave out to use anonymous resolution)
+            username = "admin" // Artifactory user name
+            password = "Admin_20" // Password or API Key
         }
     }
-    resolve {
-        repository {
-            repoKey = 'gradel-dev-virtual'
-            username = "${artifactory_user}"
-            password = "${artifactory_password}"
-            maven = true
-            
+  
+    ivy {
+        +url "http://65.0.99.163:8082/ivy-releases"
+        layout "pattern", {     // Optional section for configuring Ivy-style resolution.
+            ivy "[organization]/[module]/[revision]/ivy.xml"
+            artifact "[organization]/[module]/[revision]/[module]-[revision](-[classifier]).[ext]"
+            m2compatible = true // Convert any dots in an [organization] layout value to path separators, similar to Maven's groupId-to-path conversion. False if not specified.
         }
     }
 }
+
+artifactory {
+  +contextUrl = 'http://65.0.99.163:8082/artifactory'   //The base Artifactory URL if not overridden by the publisher/resolver
+  publish {
+    contextUrl = 'http://65.0.99.163:8082/artifactory'   //The base Artifactory URL for the publisher
+    //A closure defining publishing information
+    repository {
+      repoKey = 'libs-snapshot-local'   //The Artifactory repository key to publish to
+      username = 'admin'          //The publisher user name
+      password = 'Admin_20'       //The publisher password or API key
+      ivy {
+        //Optional section for configuring Ivy publication. Assumes Maven repo layout if not specified
+        ivyLayout = '[organization]/[module]/[revision]/[type]s/ivy-[revision].xml'
+        artifactLayout = '[organization]/[module]/[revision]/[module]-[revision](-[classifier]).[ext]'
+        mavenCompatible = true //Convert any dots in an [organization] layout value to path separators, similar to Maven's groupId-to-path conversion. True if not specified
+      }
+    }
